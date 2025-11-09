@@ -4,6 +4,7 @@ from project.loans.models import Loan
 from project.loans.forms import CreateLoan
 from project.books.models import Book
 from project.customers.models import Customer
+from markupsafe import escape
 
 
 # Blueprint for loans
@@ -65,13 +66,13 @@ def create_loan():
         try:
             # Create a new loan and store original book details
             new_loan = Loan(
-                customer_name=customer_name,
-                book_name=book_name,
+                customer_name=escape(customer_name),
+                book_name=escape(book_name),
                 loan_date=loan_date,
                 return_date=return_date,
-                original_author=book.author,
+                original_author=escape(book.author),
                 original_year_published=book.year_published,
-                original_book_type=book.book_type
+                original_book_type=escape(book.book_type)
             )
 
             # Add the new loan to the database
@@ -141,10 +142,10 @@ def delete_loan(loan_id):
     try:
         # Retrieve the book associated with the loan
         book = Book(
-            name=loan.book_name,
-            author=loan.original_author,
+            name=escape(loan.book_name),
+            author=escape(loan.original_author),
             year_published=loan.original_year_published,
-            book_type=loan.original_book_type,
+            book_type=escape(loan.original_book_type),
             status='available'  
         )
 

@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
+from markupsafe import escape
 
 # Database Setup
 app = Flask(__name__)
@@ -16,6 +16,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 Migrate(app, db)
+
+
+# Content Security Policy header
+@app.after_request
+def set_csp(response):
+    response.headers['Content-Security-Policy'] = (
+        "font-src 'self' https://stackpath.bootstrapcdn.com https://use.fontawesome.com data:; "
+        "img-src 'self' data:;"
+    )
+    return response
 
 
 # Register Blueprints

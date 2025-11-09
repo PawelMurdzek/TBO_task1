@@ -67,12 +67,15 @@ const fetchBookDetails = (bookName) => {
 const populateDropdown = (elementId, data) => {
     const dropdown = document.getElementById(elementId);
 
-    dropdown.innerHTML = '';
+    // Clear existing options
+    while (dropdown.firstChild) {
+        dropdown.removeChild(dropdown.firstChild);
+    }
 
     data.forEach(item => {
         const option = document.createElement('option');
         option.value = item.name;  
-        option.textContent = item.name;
+        option.textContent = item.name;  // Using textContent instead of innerHTML
         dropdown.appendChild(option);
     });
 };

@@ -30,8 +30,8 @@
             <!-- Loop through customers and display each customer -->
             {% for customer in customers %}
             <tr>
-                <td>{{ customer.name | safe }}</td>
-                <td>{{ customer.city | safe }}</td>  <!-- Display 'city' instead of 'author' -->
+                <td>{{ customer.name }}</td>
+                <td>{{ customer.city }}</td>  <!-- Display 'city' instead of 'author' -->
                 <td>{{ customer.age }}</td>  <!-- Display 'age' -->
                 <td>
                     <a href="#" class="btn btn-warning btn-sm" onclick="editCustomer({{ customer.id }})">Edit</a>
@@ -120,6 +120,5 @@
 
 <!-- Custom JavaScript file (customers.js) -->
 <script src="{{ url_for('static', filename='js/customers.js') }}"></script>
-
 
 {% endblock %}

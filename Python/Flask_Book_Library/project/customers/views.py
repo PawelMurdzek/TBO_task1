@@ -1,20 +1,18 @@
 from flask import render_template, Blueprint, request, redirect, url_for, jsonify
 from project import db
 from project.customers.models import Customer
-
+from project.customers.forms import CreateCustomer
+from markupsafe import escape
 
 # Blueprint for customers
 customers = Blueprint('customers', __name__, template_folder='templates', url_prefix='/customers')
 
-
 # Route to display customers in HTML
 @customers.route('/', methods=['GET'])
 def list_customers():
-    # Fetch all customers from the database
     customers = Customer.query.all()
     print('Customers page accessed')
     return render_template('customers.html', customers=customers)
-
 
 # Route to fetch customers in JSON format
 @customers.route('/json', methods=['GET'])
@@ -26,29 +24,23 @@ def list_customers_json():
 
 
 # Route to create a new customer
-@customers.route('/create', methods=['POST', 'GET'])
+@customers.route('/create', methods=['POST'])
 def create_customer():
     data = request.form
-
-    # Validate the form data
-    if 'name' not in data or 'city' not in data or 'age' not in data:
-        print('Invalid form data')
-        return jsonify({'error': 'Invalid form data'}), 400
-
-    new_customer = Customer(name=data['name'], city=data['city'], age=data['age'])
-
+    new_customer = Customer(
+        name=escape(data['name']),
+        city=escape(data['city']),
+        age=data['age']
+    )
     try:
-        # Add the new customer to the session and commit to save to the database
         db.session.add(new_customer)
         db.session.commit()
-        print('Customer added succesfully')
-        return redirect(url_for('customers.list_customers'))
+        print('Customer added successfully')
+        return jsonify({'message': 'Customer created successfully'}), 201
     except Exception as e:
-        # Handle any exceptions, such as database errors
         db.session.rollback()
         print('Error creating customer')
         return jsonify({'error': f'Error creating customer: {str(e)}'}), 500
-
 
 # Route to fetch customer data for editing
 @customers.route('/<int:customer_id>/edit-data', methods=['GET'])
@@ -84,15 +76,15 @@ def edit_customer(customer_id):
         # Get data from the request
         data = request.form
 
-        # Update customer details
-        customer.name = data['name']
-        customer.city = data['city']
+        # Update customer details with escaping
+        customer.name = escape(data['name'])
+        customer.city = escape(data['city'])
         customer.age = data['age']
 
         # Commit the changes to the database
         db.session.commit()
         print('Customer updated succesfully')
-        return redirect(url_for('customers.list_customers'))
+        return jsonify({'message': 'Customer updated successfully'})
     except Exception as e:
         # Handle any exceptions
         db.session.rollback()
